@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>금연 일지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --card:#fffdf8; --ink:#2b2a27; --sub:#7a766c; --line:#e3ddd0;
+  --green:#4f7a5a; --green-soft:#dfe9de; --amber:#c98b3a; --amber-soft:#f6e7d0; --red:#a9533f; --red-soft:#f4e0da;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding:18px 18px 60px}
+h1{font-family:'Gowun Dodum',sans-serif;font-size:28px;margin:6px 0 4px;font-weight:400}
+.lead{color:var(--sub);margin:0 0 18px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{font-size:15px;margin:0 0 14px;font-weight:700;letter-spacing:-.2px}
+
+/* 항상 보이는 동기 배너 */
+.why{position:sticky;top:0;z-index:5;background:var(--green);color:#fff;padding:12px 18px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.why-in{max-width:1104px;margin:0 auto;display:flex;gap:12px;align-items:flex-start}
+.why-lbl{flex:0 0 auto;font-size:12px;opacity:.8;padding-top:3px}
+.why-txt{flex:1;font-family:'Gowun Dodum',sans-serif;font-size:17px;white-space:pre-wrap;max-height:5.2em;overflow:auto}
+.why-edit{flex:0 0 auto;background:rgba(255,255,255,.18);border:0;color:#fff;border-radius:8px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+
+.hero{text-align:center;padding:28px 20px}
+.hero .label{color:var(--sub);font-size:13px}
+.timer{display:flex;justify-content:center;gap:10px;margin:10px 0 6px;flex-wrap:wrap}
+.unit{min-width:70px}
+.unit b{display:block;font-family:'Gowun Dodum',sans-serif;font-size:40px;font-weight:400;color:var(--green);line-height:1.1;font-variant-numeric:tabular-nums}
+.unit span{font-size:12px;color:var(--sub)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--bg);border-radius:12px;padding:14px 10px;text-align:center}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--sub)}
+.btn{font:inherit;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:500}
+.btn-crave{width:100%;background:var(--amber);color:#fff;font-size:17px;padding:16px;margin-top:14px}
+.btn-crave:hover{filter:brightness(.95)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--sub);font-size:13px;padding:8px 12px}
+.btn-main{background:var(--green);color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+label{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+input,textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:80px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:110px;font:inherit;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--green);border-color:var(--green);color:#fff}
+.ms{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.ms:first-of-type{border-top:0}
+.dot{flex:0 0 22px;height:22px;border-radius:50%;border:2px solid var(--line);margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.ms.done .dot{background:var(--green);border-color:var(--green)}
+.ms .t{font-size:12px;color:var(--sub)}
+.ms .d{font-size:14px}
+.bar{height:5px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--amber)}
+.muted{color:var(--sub);font-size:13px}
+.log{font-size:13px;color:var(--sub);margin:6px 0 0;padding-left:18px}
+.hidden{display:none!important}
+.harm{background:var(--red-soft);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.harm h3{margin:0 0 6px;font-size:14px;color:var(--red)}
+.harm ul{margin:0;padding-left:18px;font-size:14px}
+.harm li{margin:3px 0}
+.src{font-size:12px;color:var(--sub);margin-top:6px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--sub);border-radius:999px;padding:6px 12px;cursor:pointer}
+.tabs button.on{background:var(--red);border-color:var(--red);color:#fff}
+/* overlay */
+.overlay{position:fixed;inset:0;background:rgba(43,42,39,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal{background:var(--card);border-radius:20px;max-width:420px;width:100%;padding:22px;text-align:center;max-height:94vh;overflow:auto}
+.modal-why{background:var(--green-soft);color:var(--green);border-radius:12px;padding:10px 12px;font-family:'Gowun Dodum',sans-serif;font-size:16px;white-space:pre-wrap;margin-bottom:6px}
+.breath{width:150px;height:150px;margin:20px auto;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-family:'Gowun Dodum',sans-serif;font-size:20px;color:var(--green);transition:transform 4s ease-in-out}
+.cd{font-size:30px;font-variant-numeric:tabular-nums;font-family:'Gowun Dodum',sans-serif}
+.tip{background:var(--amber-soft);border-radius:12px;padding:12px;font-size:14px;margin:14px 0}
+.help a{color:var(--green)}
+/* 2단 레이아웃 */
+.layout{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:minmax(0,720px) 360px;gap:24px;justify-content:center;padding:0 18px}
+.layout .wrap{padding-left:0;padding-right:0;max-width:none}
+.side{position:sticky;top:96px;align-self:start;margin-top:18px}
+.cyber{background:#26241f;border-radius:18px;padding:16px;color:#efe9dc}
+.cyber h2{font-size:15px;margin:0 0 2px;color:#efe9dc}
+.cyber .cs{font-size:12px;color:#a59f91;margin:0 0 8px}
+.cyber canvas{display:block;width:100%;height:auto;touch-action:none;cursor:pointer;border-radius:12px;background:radial-gradient(ellipse at 50% 80%,#34312a,#1e1c18)}
+.cyber .cstat{display:flex;justify-content:space-between;font-size:12px;color:#a59f91;margin-top:8px}
+.cyber .btn{background:#3a372f;color:#efe9dc;font-size:13px;padding:8px 12px}
+.cyber .hint{font-size:12px;color:#a59f91;margin:8px 0 0;text-align:center}
+.mobile-only{display:none}
+.layout:has(#cyber.hidden){grid-template-columns:minmax(0,720px)}
+.cyhead{display:flex;justify-content:space-between;align-items:center}
+.mini{background:#3a372f;border:0;border-radius:8px;color:#efe9dc;font-size:14px;padding:4px 8px;cursor:pointer}
+.cysel{display:flex;gap:6px;margin-bottom:8px}
+.cysel select{flex:1;min-width:0;font:inherit;font-size:13px;background:#3a372f;color:#efe9dc;border:0;border-radius:8px;padding:7px 8px}
+.cvwrap{position:relative}
+.cymsg{position:absolute;left:0;right:0;top:14px;text-align:center;font-family:'Gowun Dodum',sans-serif;font-size:22px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);pointer-events:none;opacity:0;transition:opacity .3s;padding:0 10px}
+.cymsg.show{opacity:1}
+.cyact{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.cyact .btn{flex:1;min-width:90px}
+.cyact .btn:disabled{opacity:.4;cursor:default}
+.seg small{font-size:11px;opacity:.75}
+@media (max-width:1120px){
+  .layout{grid-template-columns:minmax(0,720px);}
+  .side{position:static;margin-top:0;margin-bottom:40px}
+  .mobile-only{display:block}
+}
+.btn-will{width:100%;background:transparent;border:2px solid var(--green);color:var(--green);margin-top:8px;font-size:15px}
+.btn-will:hover{background:var(--green-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0}
+.chips button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--ink)}
+.chips button.on{background:var(--green);color:#fff;border-color:var(--green)}
+.gain{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.gain div{background:var(--bg);border-radius:10px;padding:10px;font-size:12px;color:var(--sub)}
+.gain b{display:block;font-size:17px;color:var(--ink)}
+.advice{background:var(--green-soft);border-radius:12px;padding:12px;font-size:14px;text-align:left;margin:8px 0}
+.lose{background:var(--red-soft);border-radius:12px;padding:12px;font-size:14px;text-align:left;margin:8px 0}
+.lose b{color:var(--red)}
+.cheer{font-family:'Gowun Dodum',sans-serif;font-size:18px;margin:4px 0 10px}
+@media (max-width:520px){.stat b{font-size:16px}.unit{min-width:58px}.unit b{font-size:32px}.grid2{grid-template-columns:1fr}.why-txt{font-size:15px}}
+</style>
+</head>
+<body>
+
+<!-- 항상 보이는 동기 -->
+<div class="why hidden" id="why">
+  <div class="why-in">
+    <div class="why-lbl">내가 끊는 이유</div>
+    <div class="why-txt" id="whyTxt"></div>
+    <button class="why-edit" id="whyEdit">수정</button>
+  </div>
+</div>
+
+<div class="layout">
+<div class="wrap">
+  <h1>금연 일지</h1>
+  <p class="lead">담배 없이 지낸 시간을 세고, 당길 때 버틸 수 있게 도와주는 페이지예요. 연초·전자담배 모두 쓸 수 있어요.</p>
+
+  <!-- 설정 -->
+  <section class="card" id="setup">
+    <h2>시작하기</h2>
+    <label>무엇을 끊나요?</label>
+    <div class="seg" id="typeSeg">
+      <button data-d="zelos">젤로맥스<br><small>액상 팟</small></button>
+      <button data-d="nasty">네스티 일회용 30000<br><small>액상 일회용</small></button>
+      <button data-d="lil">릴 하이브리드<br><small>궐련형</small></button>
+      <button data-d="cig">연초<br><small>일반 담배</small></button>
+    </div>
+    <label for="qDate">금연 시작 일시</label><input type="datetime-local" id="qDate">
+
+    <div id="stickFields" class="grid2">
+      <div><label for="qPerDay">하루에 피우던 개비 수</label><input type="number" id="qPerDay" min="1" value="15"></div>
+      <div><label for="qPrice" id="qPriceLbl">한 갑 가격 (원)</label><input type="number" id="qPrice" min="0" step="100" value="4500"></div>
+      <div><label for="qPack">한 갑 개비 수</label><input type="number" id="qPack" min="1" value="20"></div>
+    </div>
+    <div id="liquidFields" class="grid2 hidden">
+      <div><label for="lPrice" id="lPriceLbl">액상 한 병(또는 팟) 가격 (원)</label><input type="number" id="lPrice" min="0" step="100" value="20000"></div>
+      <div><label for="lDays" id="lDaysLbl">한 병을 며칠 동안 썼나요?</label><input type="number" id="lDays" min="1" step="0.5" value="7"></div>
+    </div>
+
+    <label for="qReason">끊으려는 이유 (화면 맨 위에 항상 떠 있어요)</label>
+    <textarea id="qReason" placeholder="예) 아침에 목 칼칼한 거 그만하고 싶어서.&#10;아낀 돈으로 타블렛 사기."></textarea>
+    <div class="row"><button class="btn btn-main" id="saveBtn">저장하고 시작</button>
+      <button class="btn btn-ghost hidden" id="cancelEdit">취소</button></div>
+  </section>
+
+  <!-- 메인 -->
+  <div id="main" class="hidden">
+    <section class="card hero">
+      <div class="label" id="heroLabel">담배 없이 보낸 시간</div>
+      <div class="timer">
+        <div class="unit"><b id="tD">0</b><span>일</span></div>
+        <div class="unit"><b id="tH">0</b><span>시간</span></div>
+        <div class="unit"><b id="tM">0</b><span>분</span></div>
+        <div class="unit"><b id="tS">0</b><span>초</span></div>
+      </div>
+      <div class="muted" id="sinceTxt"></div>
+    </section>
+
+    <section class="card">
+      <div class="stats">
+        <div class="stat"><b id="sCig">0</b><span id="sCigLbl">안 피운 개비</span></div>
+        <div class="stat"><b id="sWon">0원</b><span>아낀 돈</span></div>
+        <div class="stat"><b id="sWin">0</b><span>참아낸 순간</span></div>
+      </div>
+      <button class="btn btn-crave" id="craveBtn">지금 담배가 당겨요</button>
+      <button class="btn btn-will" id="willBtn">나 의지가 약해진다…</button>
+      <p class="muted" style="text-align:center;margin:8px 0 0">흡연 욕구는 보통 몇 분 안에 가라앉아요. 3분만 같이 버텨봐요.</p>
+      <p class="muted mobile-only" style="text-align:center;margin:6px 0 0"><a href="#cyber" style="color:var(--green)">손이 심심하면 사이버 담배 ↓</a></p>
+    </section>
+
+    <section class="card">
+      <h2>계속 피우면 생기는 일</h2>
+      <div class="tabs" id="harmTabs">
+        <button data-h="liquid">액상형 전자담배</button>
+        <button data-h="heat">궐련형 전자담배</button>
+        <button data-h="cig">연초</button>
+        <button data-h="all">공통</button>
+      </div>
+      <div id="harmBody"></div>
+    </section>
+
+    <section class="card">
+      <h2>끊고 나면 달라지는 것</h2>
+      <div id="milestones"></div>
+      <p class="muted" style="margin-top:10px" id="msNote"></p>
+    </section>
+
+    <section class="card">
+      <h2>기록</h2>
+      <p class="muted" style="margin:0">한 번 피웠다고 실패가 아니에요. 기록만 하고 계속 가도 돼요.</p>
+      <div class="row">
+        <button class="btn btn-ghost" id="slipBtn">한 번 피웠어요 (기록만)</button>
+        <button class="btn btn-ghost" id="resetBtn">시작 시간 다시 정하기</button>
+        <button class="btn btn-ghost" id="editBtn">설정 수정</button>
+      </div>
+      <ul class="log" id="slipLog"></ul>
+    </section>
+
+    <section class="card help">
+      <h2>도움받을 곳</h2>
+      <p style="margin:0 0 6px;font-size:14px"><b>금연상담전화 1544-9030</b> — 무료 전화 상담. 상담사가 몇 달 동안 연락하며 관리해 줘요. 전자담배도 상담해 줘요.</p>
+      <p style="margin:0 0 6px;font-size:14px"><b>보건소 금연클리닉</b> — 무료 상담, 니코틴 패치·껌 같은 보조제도 받을 수 있어요.</p>
+      <p style="margin:0;font-size:14px"><a href="https://nosmk.khealth.or.kr" target="_blank" rel="noopener">금연두드림 (nosmk.khealth.or.kr)</a> — 한국건강증진개발원 금연 서비스</p>
+    </section>
+  </div>
+</div>
+
+<!-- 오른쪽: 사이버 담배 -->
+<aside class="side hidden" id="cyber">
+  <div class="cyber">
+    <div class="cyhead"><h2 id="cyTitle">사이버 담배</h2><button class="mini" id="cyMute" title="소리 켜기/끄기">🔊</button></div>
+    <p class="cs">니코틴 0 · 타르 0 · 0원</p>
+    <div class="cysel">
+      <select id="cyDev">
+        <option value="zelos">젤로맥스</option>
+        <option value="nasty">네스티 일회용 30000</option>
+        <option value="lil">릴 하이브리드</option>
+        <option value="cig">연초</option>
+      </select>
+      <select id="cyFlavor"></select>
+    </div>
+    <div class="cvwrap">
+      <canvas id="cyCanvas" width="328" height="400" tabindex="0" aria-label="누르고 있으면 들이마시고, 떼면 내뱉어요"></canvas>
+      <div class="cymsg" id="cyMsg"></div>
+    </div>
+    <p class="hint" id="cyHint">꾹 누르고 있으면 들이마시고, 떼면 후— 내뱉어요</p>
+    <div class="cyact" id="cyActions"></div>
+    <div class="cstat"><span id="cyStatus"></span><span id="cyCount">0모금</span></div>
+    <p class="hint">길게 들이쉬고 천천히 내쉬면 그대로 심호흡이 돼요.</p>
+  </div>
+</aside>
+</div>
+
+<!-- 당길 때 모달 -->
+<div class="overlay hidden" id="crave">
+  <div class="modal">
+    <div class="modal-why" id="modalWhy"></div>
+    <div class="breath" id="breath">들이쉬기</div>
+    <div class="cd" id="cd">3:00</div>
+    <div class="tip" id="tip"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-ghost" id="nextTip">다른 방법</button>
+      <button class="btn btn-main" id="doneCrave">버텼어요</button>
+    </div>
+  </div>
+</div>
+
+<!-- 의지 약해질 때 모달 -->
+<div class="overlay hidden" id="will">
+  <div class="modal">
+    <div class="cheer" id="cheer"></div>
+    <div class="modal-why" id="willWhy"></div>
+    <div class="gain">
+      <div><b id="gTime">-</b>버텨온 시간</div>
+      <div><b id="gWon">-</b>아낀 돈</div>
+      <div><b id="gWin">-</b>참아낸 순간</div>
+      <div><b id="gMs">-</b>지나온 회복 단계</div>
+    </div>
+    <div class="lose"><b>지금 피우면</b><br>금단 증상이 다시 처음부터 시작돼요. 제일 힘든 처음 2~3일을 또 겪어야 해요. 그리고 '딱 한 번만'은 다시 매일로 이어지기 쉬워요.</div>
+    <p class="muted" style="margin:12px 0 0">왜 흔들리는 것 같아요?</p>
+    <div class="chips" id="whyChips">
+      <button data-k="stress">스트레스</button><button data-k="bored">심심해서</button>
+      <button data-k="work">작업이 막혀서</button><button data-k="tired">피곤해서</button>
+      <button data-k="coffee">커피·술 마셔서</button><button data-k="people">옆에서 피워서</button>
+      <button data-k="sad">기분이 가라앉아서</button>
+    </div>
+    <div class="advice hidden" id="advice"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-ghost" id="willClose">괜찮아졌어요</button>
+      <button class="btn btn-ghost" id="willCyber">사이버 담배 피우기</button>
+      <button class="btn btn-main" id="willCrave">3분 같이 버티기</button>
+    </div>
+    <p class="muted" style="margin:12px 0 0">혼자 버티기 힘들면 <b>금연상담전화 1544-9030</b> (무료)</p>
+  </div>
+</div>
+
+<!-- 확인 모달 -->
+<div class="overlay hidden" id="confirmBox">
+  <div class="modal">
+    <p id="confirmMsg" style="margin:0 0 16px"></p>
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-ghost" id="confirmNo">아니요</button>
+      <button class="btn btn-main" id="confirmYes">네</button>
+    </div>
+  </div>
+</div>
+
+<!-- 동기 수정 모달 -->
+<div class="overlay hidden" id="whyBox">
+  <div class="modal" style="text-align:left">
+    <label for="whyInput" style="margin-top:0">내가 끊는 이유</label>
+    <textarea id="whyInput"></textarea>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn btn-ghost" id="whyCancel">취소</button>
+      <button class="btn btn-main" id="whySave">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='quit-smoking-v1';
+let state=null;
+function load(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+const $=id=>document.getElementById(id);
+const TYPE_NAME={cig:'연초',heat:'궐련형 전자담배',liquid:'액상형 전자담배'};
+
+/* 회복 단계 — for: 어떤 종류에 보여줄지 */
+const MILESTONES=[
+  {d:20/1440,t:'20분',x:'심박수와 혈압이 내려가기 시작해요.',for:['cig','heat','liquid']},
+  {d:0.5,t:'12시간',x:'혈액 속 일산화탄소 수치가 정상으로 돌아와요.',for:['cig']},
+  {d:2,t:'2~3일',x:'금단 증상이 가장 심한 때예요. 여기만 넘기면 조금씩 나아져요.',for:['cig','heat','liquid']},
+  {d:7,t:'1주',x:'다시 피우기 가장 쉬운 첫 주를 넘겼어요.',for:['cig','heat','liquid']},
+  {d:14,t:'2주',x:'혈액순환과 폐 기능이 좋아지기 시작해요. (2주~3개월)',for:['cig']},
+  {d:30,t:'1개월',x:'짜증·불안 같은 금단 증상이 대부분 가라앉아요. (보통 2~4주)',for:['cig','heat','liquid']},
+  {d:30.01,t:'1개월',x:'기침과 숨참이 줄어들어요. (1~9개월)',for:['cig']},
+  {d:365,t:'1년',x:'관상동맥 심장질환 위험이 흡연자의 절반 정도로 줄어요.',for:['cig']},
+  {d:365*5,t:'5년',x:'뇌졸중 위험이 비흡연자 수준에 가까워져요. (5~15년)',for:['cig']},
+  {d:365*10,t:'10년',x:'폐암 사망 위험이 흡연자의 절반 정도로 줄어요.',for:['cig']},
+  {d:365*15,t:'15년',x:'심장질환 위험이 비흡연자와 비슷해져요.',for:['cig']}
+];
+const MS_NOTE={
+  cig:'WHO·미국 CDC 등에서 안내하는 일반적인 회복 경과예요. 사람마다 차이가 있어요.',
+  heat:'금단 증상 경과는 미국 국립암연구소(NCI) 안내 기준이에요. 궐련형 전자담배를 끊은 뒤의 장기적인 회복 경과는 아직 연구가 부족해서 넣지 않았어요.',
+  liquid:'금단 증상 경과는 미국 국립암연구소(NCI) 안내 기준이에요. 액상형 전자담배는 오래 쓰면 몸에 어떤 영향이 있는지 아직 연구 중이라 장기 회복 경과는 넣지 않았어요.'
+};
+
+/* 해로운 점 */
+const HARMS={
+  liquid:`<div class="harm"><h3>"수증기"가 아니에요</h3><ul>
+    <li>들이마시는 건 에어로졸이에요. 니코틴, 폐 깊숙이 들어가는 초미세입자가 들어 있어요.</li>
+    <li>포름알데히드 같은 발암물질, 니켈·주석·납 같은 중금속이 들어 있을 수 있어요.</li>
+    <li>디아세틸 같은 가향물질은 심각한 폐 질환과 관련이 있어요.</li>
+    <li>"니코틴 0%"라고 팔던 제품에서 니코틴이 나온 사례도 있어요.</li></ul>
+    <div class="src">출처: 미국 CDC 전자담배 안내</div></div>
+  <div class="harm"><h3>니코틴 중독은 그대로</h3><ul>
+    <li>대부분의 액상에는 니코틴이 들어 있고, 니코틴은 중독성이 강해요.</li>
+    <li>연초보다 유해물질이 적다는 건 "안전하다"는 뜻이 아니에요. 장기적인 영향은 아직 다 밝혀지지 않았어요.</li>
+    <li>불량 배터리 때문에 불이 나거나 폭발한 사고도 있었어요.</li>
+    <li>내뿜은 에어로졸은 옆 사람도 마셔요.</li></ul>
+    <div class="src">출처: 미국 CDC 전자담배 안내</div></div>`,
+  heat:`<div class="harm"><h3>식약처 분석 결과 (2018)</h3><ul>
+    <li>아이코스·글로·릴 3종에서 벤조피렌·벤젠·포름알데히드 같은 1급 발암물질이 나왔어요.</li>
+    <li>니코틴은 일반 담배와 비슷한 수준이었어요.</li>
+    <li>타르는 일부 제품에서 일반 담배보다 높게 측정됐어요.</li>
+    <li>식약처 판단: 일반 담배보다 덜 해롭다는 근거는 없다.</li></ul>
+    <div class="src">출처: 식품의약품안전처 궐련형 전자담배 유해성분 분석 발표 (2018.6.7)</div></div>`,
+  cig:`<div class="harm"><h3>연기 한 모금에</h3><ul>
+    <li>담배 연기에는 약 7,000가지 화학물질이 있고, 그중 약 70가지가 발암물질이에요.</li>
+    <li>폐암, 심장병, 뇌졸중, 만성폐쇄성폐질환(COPD)의 주요 원인이에요.</li>
+    <li>일산화탄소가 혈액의 산소 운반을 막아요. 계단 오를 때 숨찬 이유 중 하나예요.</li></ul>
+    <div class="src">출처: 미국 CDC, 식품의약품안전처</div></div>`,
+  all:`<div class="harm"><h3>종류 상관없이</h3><ul>
+    <li>니코틴은 심박수와 혈압을 올려요.</li>
+    <li>니코틴이 떨어지면 불안하고 짜증 나는 상태가 반복돼요. 담배가 스트레스를 풀어주는 게 아니라 금단 증상을 잠깐 멈추는 거예요.</li>
+    <li>작업하다 흐름이 끊기고, 피울 곳을 찾아다니게 돼요.</li>
+    <li>매달 나가는 돈이 쌓여요. 위의 "아낀 돈"을 확인해 보세요.</li></ul></div>`
+};
+
+const TIPS=[
+  '찬물 한 컵을 천천히 마셔보세요.',
+  '자리에서 일어나 5분만 걸어보세요. 장소를 바꾸면 욕구가 끊겨요.',
+  '손이나 입이 심심하면 껌, 이쑤시개, 볼펜 돌리기.',
+  '양치하거나 세수해 보세요. 입이 개운하면 생각이 덜 나요.',
+  '누군가에게 메시지 하나 보내기. 지금 참는 중이라고 말해도 좋아요.',
+  '"딱 10분만 미루자"고 정해보세요. 10분 뒤엔 대개 지나가 있어요.',
+  '위에 적은 끊는 이유를 소리 내서 한 번 읽어보세요.',
+  '전자담배 기기를 눈에 안 보이는 곳에 치워두세요. 손에 닿으면 습관처럼 물게 돼요.',
+  '커피 마실 때 당긴다면 그 자리를 잠깐 벗어나 보세요.'
+];
+
+function fmtWon(n){return Math.floor(n).toLocaleString('ko-KR')+'원'}
+function toLocalInput(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+
+/* 동기 배너 */
+function renderWhy(){
+  const r=state&&state.reason;
+  $('why').classList.toggle('hidden',!r);
+  $('whyTxt').textContent=r||'';
+  $('modalWhy').textContent=r||'';
+  $('modalWhy').classList.toggle('hidden',!r);
+  document.title=r?('🌿 '+r.split('\n')[0]):'금연 일지';
+}
+$('whyEdit').onclick=()=>{$('whyInput').value=state.reason||'';$('whyBox').classList.remove('hidden');$('whyInput').focus()};
+$('whyCancel').onclick=()=>$('whyBox').classList.add('hidden');
+$('whySave').onclick=()=>{state.reason=$('whyInput').value.trim();save();renderWhy();$('whyBox').classList.add('hidden')};
+
+/* 설정 */
+const DEV_TYPE={zelos:'liquid',nasty:'liquid',lil:'heat',cig:'cig'};
+const DEV_NAME={zelos:'젤로맥스',nasty:'네스티 일회용 30000',lil:'릴 하이브리드',cig:'연초'};
+let selDev='zelos';
+function setDevice(d){
+  const prev=selDev;selDev=d;const t=DEV_TYPE[d];
+  document.querySelectorAll('#typeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.d===d));
+  $('stickFields').classList.toggle('hidden',t==='liquid');
+  $('liquidFields').classList.toggle('hidden',t!=='liquid');
+  $('qPriceLbl').textContent=d==='lil'?'스틱 한 갑 + 카트리지 가격 (원)':'한 갑 가격 (원)';
+  $('lPriceLbl').textContent=d==='nasty'?'기기 하나 가격 (원)':'액상 한 병(또는 팟) 가격 (원)';
+  $('lDaysLbl').textContent=d==='nasty'?'기기 하나를 며칠 동안 썼나요?':'한 병을 며칠 동안 썼나요?';
+  const p=+$('qPrice').value;
+  if(d==='lil'&&p===4500)$('qPrice').value=5000;
+  if(d==='cig'&&p===5000&&prev==='lil')$('qPrice').value=4500;
+}
+document.querySelectorAll('#typeSeg button').forEach(b=>b.onclick=()=>setDevice(b.dataset.d));
+function devOf(s){return s.device||({cig:'cig',heat:'lil',liquid:'zelos'})[s.type]||'zelos'}
+
+function showSetup(editing){
+  $('setup').classList.remove('hidden');$('main').classList.add('hidden');$('cyber').classList.add('hidden');
+  const s=state||{};
+  $('qDate').value=toLocalInput(s.start?new Date(s.start):new Date());
+  $('qPerDay').value=s.perDay||15;$('qPrice').value=s.price??4500;$('qPack').value=s.pack||20;
+  $('lPrice').value=s.lPrice??20000;$('lDays').value=s.lDays||7;
+  $('qReason').value=s.reason||'';
+  setDevice(state?devOf(state):'zelos');
+  $('cancelEdit').classList.toggle('hidden',!editing);
+}
+function showMain(){
+  $('setup').classList.add('hidden');$('main').classList.remove('hidden');
+  const t=state.type||'cig';
+  const dv=devOf(state);
+  $('heroLabel').textContent=(t==='cig'?'담배':DEV_NAME[dv])+' 없이 보낸 시간';
+  $('sCigLbl').textContent=dv==='nasty'?'안 산 일회용':t==='liquid'?'안 쓴 액상':'안 피운 개비';
+  $('msNote').textContent=MS_NOTE[t];
+  setHarm(t);
+  $('cyber').classList.remove('hidden');cyberInit(dv);
+  renderWhy();renderSlips();tick();
+}
+$('saveBtn').onclick=()=>{
+  const d=new Date($('qDate').value);
+  state=Object.assign(state||{wins:0,slips:[]},{
+    type:DEV_TYPE[selDev],device:selDev,
+    start:isNaN(d)?Date.now():d.getTime(),
+    perDay:Math.max(1,+$('qPerDay').value||15),
+    price:Math.max(0,+$('qPrice').value||0),
+    pack:Math.max(1,+$('qPack').value||20),
+    lPrice:Math.max(0,+$('lPrice').value||0),
+    lDays:Math.max(0.5,+$('lDays').value||7),
+    reason:$('qReason').value.trim()
+  });
+  save();showMain();
+};
+$('cancelEdit').onclick=showMain;
+$('editBtn').onclick=()=>showSetup(true);
+
+/* 해로운 점 탭 */
+function setHarm(h){
+  document.querySelectorAll('#harmTabs button').forEach(b=>b.classList.toggle('on',b.dataset.h===h));
+  $('harmBody').innerHTML=HARMS[h];
+}
+document.querySelectorAll('#harmTabs button').forEach(b=>b.onclick=()=>setHarm(b.dataset.h));
+
+/* 매초 갱신 */
+function tick(){
+  if(!state||$('main').classList.contains('hidden'))return;
+  const t=state.type||'cig';
+  const ms=Math.max(0,Date.now()-state.start);
+  const sec=Math.floor(ms/1000);
+  $('tD').textContent=Math.floor(sec/86400);
+  $('tH').textContent=Math.floor(sec%86400/3600);
+  $('tM').textContent=Math.floor(sec%3600/60);
+  $('tS').textContent=sec%60;
+  const days=ms/86400000;
+  if(t==='liquid'){
+    const bottles=days/state.lDays;
+    $('sCig').textContent=bottles.toFixed(1)+(devOf(state)==='nasty'?'개':'병');
+    $('sWon').textContent=fmtWon(bottles*state.lPrice);
+  }else{
+    const cig=Math.max(0,days*state.perDay-(state.slips||[]).length);
+    $('sCig').textContent=Math.floor(cig).toLocaleString('ko-KR')+'개비';
+    $('sWon').textContent=fmtWon(cig*state.price/state.pack);
+  }
+  $('sWin').textContent=(state.wins||0)+'번';
+  const st=new Date(state.start);
+  $('sinceTxt').textContent=`${st.getFullYear()}년 ${st.getMonth()+1}월 ${st.getDate()}일 ${st.getHours()}시 ${String(st.getMinutes()).padStart(2,'0')}분부터`;
+  renderMilestones(days,t);
+}
+function renderMilestones(days,t){
+  const list=MILESTONES.filter(m=>m.for.includes(t));
+  let html='',nextShown=false;
+  list.forEach((m,i)=>{
+    const done=days>=m.d;let bar='';
+    if(!done&&!nextShown){nextShown=true;const from=i?list[i-1].d:0;const pct=Math.min(100,Math.max(0,(days-from)/(m.d-from)*100));bar=`<div class="bar"><i style="width:${pct.toFixed(1)}%"></i></div>`}
+    html+=`<div class="ms ${done?'done':''}"><div class="dot">${done?'✓':''}</div><div style="flex:1"><div class="t">${m.t}</div><div class="d">${m.x}</div>${bar}</div></div>`;
+  });
+  $('milestones').innerHTML=html;
+}
+setInterval(tick,1000);
+
+/* 당길 때 */
+let craveTimer=null,breathTimer=null,remain=180,tipIdx=0;
+function setTip(){$('tip').textContent=TIPS[tipIdx%TIPS.length];}
+$('craveBtn').onclick=()=>{
+  $('crave').classList.remove('hidden');remain=180;tipIdx=Math.floor(Math.random()*TIPS.length);setTip();
+  const b=$('breath');let phase=0;
+  const phases=[['들이쉬기',1.3,4000],['멈추기',1.3,4000],['내쉬기',1,6000]];
+  function step(){const [txt,sc,dur]=phases[phase%3];b.textContent=txt;b.style.transitionDuration=(txt==='멈추기'?0:dur/1000)+'s';b.style.transform=`scale(${sc})`;phase++;breathTimer=setTimeout(step,dur)}
+  step();
+  const draw=()=>{$('cd').textContent=remain>0?`${Math.floor(remain/60)}:${String(remain%60).padStart(2,'0')}`:'잘 버텼어요!'};
+  draw();
+  craveTimer=setInterval(()=>{remain--;draw();if(remain<=0)clearInterval(craveTimer)},1000);
+};
+$('nextTip').onclick=()=>{tipIdx++;setTip()};
+$('doneCrave').onclick=()=>{
+  clearInterval(craveTimer);clearTimeout(breathTimer);
+  $('crave').classList.add('hidden');$('breath').style.transform='scale(1)';
+  state.wins=(state.wins||0)+1;save();tick();
+};
+
+/* 확인창 */
+function ask(msg,onYes){$('confirmMsg').textContent=msg;$('confirmBox').classList.remove('hidden');
+  $('confirmYes').onclick=()=>{$('confirmBox').classList.add('hidden');onYes()};
+  $('confirmNo').onclick=()=>$('confirmBox').classList.add('hidden');}
+$('slipBtn').onclick=()=>ask('한 번 피운 걸 기록할까요? 타이머는 그대로 이어져요.',()=>{state.slips=state.slips||[];state.slips.push(Date.now());save();renderSlips();tick();});
+$('resetBtn').onclick=()=>ask('지금부터 다시 시작할까요? 참아낸 횟수는 남겨둘게요.',()=>{state.start=Date.now();state.slips=[];save();renderSlips();tick();});
+function renderSlips(){
+  const s=state.slips||[];
+  $('slipLog').innerHTML=s.slice(-5).reverse().map(t=>{const d=new Date(t);return `<li>${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')} 한 번</li>`}).join('');
+}
+
+/* ===== 의지가 약해질 때 ===== */
+const CHEERS=[
+  '흔들리는 건 실패가 아니에요. 지금 이 버튼을 누른 게 버티는 중이라는 증거예요.',
+  '여기까지 온 시간, 다시 0으로 돌리기엔 아깝잖아요.',
+  '이 마음은 파도처럼 와요. 올라왔다가 반드시 내려가요.',
+  '지금 피우고 싶은 건 "나"가 아니라 니코틴이에요.',
+  '오늘 하루만, 아니 지금 10분만 넘겨봐요.'
+];
+const ADVICE={
+  stress:'담배가 스트레스를 풀어주는 것 같지만, 실제로는 니코틴이 떨어져서 생긴 불안을 잠깐 멈춰주는 거예요. 끊고 시간이 지나면 이 불안 자체가 줄어들어요. 지금은 숨을 길게 내쉬는 게 제일 빨라요. 사이버 담배로 크게 한 번 들이쉬고 천천히 내뱉어 보세요.',
+  bored:'손이랑 입이 할 일을 잃은 거예요. 사이버 담배를 피우거나, 물 한 컵, 껌, 아니면 5분 산책으로 손과 입에 다른 할 일을 줘보세요.',
+  work:'작업이 막힐 때 담배 타임이 "생각 정리 시간"이었을 거예요. 담배 말고 그 쉬는 시간만 가져가세요. 일어나서 창밖 보기, 물 마시기, 5분 걷기. 쉬는 건 그대로 해도 돼요.',
+  tired:'피곤하면 버티는 힘이 제일 약해져요. 그럴 땐 의지 탓하지 말고 그냥 일찍 눕거나, 세수하고 물부터 마셔요. 자고 일어나면 생각보다 덜 당겨요.',
+  coffee:'커피·술은 담배랑 짝꿍처럼 묶인 습관이라 같이 떠올라요. 처음 몇 주는 마시는 장소나 순서를 바꿔보세요. 마시고 나서 바로 양치하는 것도 효과 있어요.',
+  people:'옆에서 피우는 건 제일 강한 유혹이에요. 처음 몇 주만이라도 흡연 자리에서는 잠깐 빠져도 괜찮아요. "나 끊는 중"이라고 한마디 해두면 주변에서도 덜 권해요.',
+  sad:'기분이 가라앉을 때 담배가 위로처럼 느껴질 수 있어요. 끊고 첫 몇 주는 기분이 처지는 게 흔하고 보통 한 달 안에 나아져요. 그래도 많이 힘들거나 오래가면 혼자 참지 말고 주변 사람이나 1544-9030에 이야기해 보세요.'
+};
+function fmtDur(ms){const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return d?`${d}일 ${h}시간`:h?`${h}시간 ${m}분`:`${m}분`}
+$('willBtn').onclick=()=>{
+  const t=state.type||'cig',ms=Math.max(0,Date.now()-state.start),days=ms/86400000;
+  $('cheer').textContent=CHEERS[Math.floor(Math.random()*CHEERS.length)];
+  $('willWhy').textContent=state.reason||'';$('willWhy').classList.toggle('hidden',!state.reason);
+  $('gTime').textContent=fmtDur(ms);
+  $('gWon').textContent=$('sWon').textContent;
+  $('gWin').textContent=(state.wins||0)+'번';
+  const list=MILESTONES.filter(m=>m.for.includes(t));
+  $('gMs').textContent=`${list.filter(m=>days>=m.d).length} / ${list.length}`;
+  document.querySelectorAll('#whyChips button').forEach(b=>b.classList.remove('on'));
+  $('advice').classList.add('hidden');
+  $('will').classList.remove('hidden');
+};
+document.querySelectorAll('#whyChips button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#whyChips button').forEach(x=>x.classList.toggle('on',x===b));
+  $('advice').textContent=ADVICE[b.dataset.k];$('advice').classList.remove('hidden');
+});
+$('willClose').onclick=()=>{$('will').classList.add('hidden');state.wins=(state.wins||0)+1;save();tick();};
+$('willCrave').onclick=()=>{$('will').classList.add('hidden');$('craveBtn').click();};
+$('willCyber').onclick=()=>{$('will').classList.add('hidden');$('cyber').scrollIntoView({behavior:'smooth',block:'center'});$('cyCanvas').focus({preventScroll:true});};
+
+/* ===== 사이버 담배 ===== */
+const FLAVORS=[
+  {k:'menthol',n:'멘솔',c:'#bfe8f0',line:['화— 목이 뻥 뚫린다','멘솔이 코까지 올라온다']},
+  {k:'bluementhol',n:'블루베리 멘솔',c:'#8f8fe0',line:['블루베리 향이 화하게 퍼진다','시원한 블루베리 맛']},
+  {k:'grape',n:'청포도',c:'#b9e08a',line:['청포도 향이 확 퍼진다','달달한 청포도 맛']},
+  {k:'melon',n:'수박',c:'#f08a95',line:['여름 수박 맛','수박바 맛이 난다']},
+  {k:'peach',n:'복숭아',c:'#f6b99a',line:['복숭아 향이 은은하다','달달한 복숭아']},
+  {k:'mango',n:'망고',c:'#f5c34e',line:['진한 망고 맛','망고 향 가득']},
+  {k:'straw',n:'딸기',c:'#f07a8c',line:['딸기우유 같은 맛','새콤한 딸기']},
+  {k:'lemon',n:'레몬',c:'#f2e46b',line:['새콤한 레몬','레모네이드 맛']},
+  {k:'cola',n:'콜라',c:'#8a5a3c',line:['톡 쏘는 콜라 맛','콜라 향이 난다']},
+  {k:'energy',n:'에너지드링크',c:'#c6e86a',line:['에너지드링크 맛, 잠이 깬다(기분만)','그 음료 맛']},
+  {k:'vanilla',n:'바닐라 커스터드',c:'#f1deb0',line:['부드러운 바닐라','커스터드 크림 맛']},
+  {k:'lychee',n:'얼음 리치',c:'#f3d6e0',line:['시원한 리치','리치 향이 상큼하다']},
+  {k:'tobacco',n:'연초맛',c:'#b08a5a',line:['구수한 연초맛','타격감 있는 연초맛']}
+];
+const FL=k=>FLAVORS.find(f=>f.k===k)||FLAVORS[0];
+const cv=$('cyCanvas'),cx=cv.getContext('2d'),CW=cv.width,CH=cv.height;
+const CKEY=KEY+'-cyber';
+let cy={dev:'zelos',puffs:0,mute:false,d:{
+  zelos:{battery:1,pod:1,podOk:true,flavor:'grape'},
+  nasty:{battery:1,left:30000,flavor:'bluementhol'},
+  lil:{battery:1,stick:'none',heatT:0,sp:0,flavor:'menthol'},
+  cig:{st:'unlit',paper:1,ash:0,capsule:false,idle:0}
+}};
+try{const s=JSON.parse(localStorage.getItem(CKEY)||'null');if(s){cy.puffs=s.puffs||0;cy.mute=!!s.mute;for(const k in cy.d)Object.assign(cy.d[k],(s.d||{})[k]||{});if(s.dev)cy.dev=s.dev;}}catch(e){}
+if(cy.d.lil.stick==='heating')cy.d.lil.stick='none';
+function cySave(){try{localStorage.setItem(CKEY,JSON.stringify(cy))}catch(e){}}
+let inhaling=false,holdStart=0,heat=0,parts=[],shake=0,lastT=performance.now(),firstPuff=true,taps=[],lighterT=0,charging=null,vib=0;
+const D=()=>cy.d[cy.dev];
+
+/* --- 소리 --- */
+let AC=null,sizzle=null;
+function ac(){if(cy.mute)return null;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
+function noiseBuf(a){const b=a.createBuffer(1,a.sampleRate*2,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b}
+let NB=null;
+function noise(a,{f=1000,q=1,type='bandpass',t0=0,att=0.01,dur=0.2,vol=0.1}){
+  NB=NB||noiseBuf(a);const s=a.createBufferSource();s.buffer=NB;s.loop=true;
+  const fl=a.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
+  const g=a.createGain();const t=a.currentTime+t0;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+att+dur);
+  s.connect(fl);fl.connect(g);g.connect(a.destination);s.start(t,Math.random());s.stop(t+att+dur+0.05);
+}
+function sStart(){const a=ac();if(!a)return;NB=NB||noiseBuf(a);
+  const s=a.createBufferSource();s.buffer=NB;s.loop=true;const fl=a.createBiquadFilter();
+  fl.type='bandpass';fl.frequency.value=cy.dev==='cig'?1800:3800;fl.Q.value=0.8;
+  const g=a.createGain();g.gain.value=0;g.gain.linearRampToValueAtTime(cy.dev==='cig'?0.025:0.04,a.currentTime+0.25);
+  s.connect(fl);fl.connect(g);g.connect(a.destination);s.start();sizzle={s,g};}
+function sStop(){if(!sizzle||!AC)return;const {s,g}=sizzle;g.gain.cancelScheduledValues(AC.currentTime);g.gain.setValueAtTime(g.gain.value,AC.currentTime);g.gain.linearRampToValueAtTime(0,AC.currentTime+0.15);s.stop(AC.currentTime+0.2);sizzle=null;}
+function sCrackle(){const a=ac();if(a)noise(a,{f:3000+Math.random()*2000,q:3,dur:0.03,vol:0.06})}
+function sExhale(h){const a=ac();if(a)noise(a,{f:700,type:'lowpass',att:0.15,dur:0.6+h*0.4,vol:0.07})}
+function sCough(){const a=ac();if(!a)return;const n=2+Math.floor(Math.random()*2);for(let i=0;i<n;i++){const t=i*(0.28+Math.random()*0.12);
+  noise(a,{f:550+Math.random()*250,q:1.2,t0:t,att:0.012,dur:0.2,vol:0.35});noise(a,{f:180,type:'lowpass',t0:t,att:0.01,dur:0.15,vol:0.25});}}
+function sClick(){const a=ac();if(a)noise(a,{f:5000,q:2,dur:0.04,vol:0.12})}
+function sBuzz(n=2){const a=ac();if(!a)return;for(let i=0;i<n;i++){const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*0.3;o.type='square';o.frequency.value=140;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(0.03,t+0.02);g.gain.setValueAtTime(0.03,t+0.18);g.gain.linearRampToValueAtTime(0.0001,t+0.22);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+0.25)}}
+function sPop(){const a=ac();if(a){noise(a,{f:2500,q:4,dur:0.05,vol:0.2})}}
+
+/* --- 메시지 --- */
+let msgTimer=null;
+function say(t,ms=1600){const m=$('cyMsg');m.textContent=t;m.classList.add('show');clearTimeout(msgTimer);msgTimer=setTimeout(()=>m.classList.remove('show'),ms)}
+function hint(t){$('cyHint').textContent=t}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* --- UI --- */
+function cyberInit(dev){ if(dev&&cy._setup!==dev){cy._setup=dev;cy.dev=dev;cySave()} buildUI(); }
+function buildUI(){
+  $('cyDev').value=cy.dev;
+  $('cyTitle').textContent=cy.dev==='cig'?'사이버 담배':'사이버 전자담배';
+  $('cyMute').textContent=cy.mute?'🔇':'🔊';
+  const fs=$('cyFlavor');
+  if(cy.dev==='cig'){fs.classList.add('hidden')}else{
+    fs.classList.remove('hidden');
+    fs.innerHTML=FLAVORS.map(f=>`<option value="${f.k}">${f.n}</option>`).join('');fs.value=D().flavor;}
+  renderActions();renderStatus();$('cyCount').textContent=`총 ${cy.puffs.toLocaleString('ko-KR')}모금`;
+  hint(defaultHint());
+}
+function defaultHint(){const d=D();
+  if(cy.dev==='cig'){if(d.st==='unlit'||d.st==='out')return '라이터로 불부터 붙이세요';if(d.st==='done')return '다 피웠어요. 새 개비 꺼내기';}
+  if(cy.dev==='lil'){if(d.stick==='none'||d.stick==='done')return '스틱부터 꽂으세요';if(d.stick==='heating')return '예열 중…';}
+  if(cy.dev==='zelos'&&!d.podOk)return '팟 인식 오류. 기기를 두 번 톡톡 쳐보세요';
+  return '꾹 누르고 있으면 들이마시고, 떼면 후— 내뱉어요';}
+function btn(label,fn,dis){return {label,fn,dis}}
+function renderActions(){
+  const d=D(),list=[];
+  if(cy.dev==='zelos'){list.push(btn('액상 채우기',()=>{d.pod=1;say('쪼르륵… 가득 채웠어요');sClick();after()}));list.push(btn(charging?'충전 중…':'충전',startCharge,!!charging||d.battery>=0.999));}
+  if(cy.dev==='nasty'){list.push(btn('새 거 뜯기',()=>{d.left=30000;d.battery=1;firstPuff=true;say('비닐 뜯는 소리… 새 거다');sPop();after()}));list.push(btn(charging?'충전 중…':'C타입 충전',startCharge,!!charging||d.battery>=0.999));}
+  if(cy.dev==='lil'){list.push(btn('스틱 꽂기',insertStick,d.stick==='heating'||d.stick==='ready'));list.push(btn(charging?'충전 중…':'충전',startCharge,!!charging||d.battery>=0.999||d.stick==='heating'));}
+  if(cy.dev==='cig'){
+    list.push(btn('라이터',lighter,!(d.st==='unlit'||d.st==='out')));
+    list.push(btn('재 털기',()=>{if(d.ash>1){dropAsh(d.ash);d.ash=0;say('톡톡');}},d.st!=='lit'));
+    list.push(btn('캡슐 딸깍',()=>{d.capsule=true;sPop();say('딸깍! 화—하다');after()},d.capsule||d.st==='done'));
+    list.push(btn('새 개비',()=>{Object.assign(d,{st:'unlit',paper:1,ash:0,capsule:false,idle:0});firstPuff=true;say('한 개비 꺼냈어요');after()}));
+  }
+  const box=$('cyActions');box.innerHTML='';
+  list.forEach(b=>{const e=document.createElement('button');e.className='btn';e.textContent=b.label;e.disabled=!!b.dis;e.onclick=b.fn;box.appendChild(e)});
+}
+function renderStatus(){const d=D();let s='';
+  const bat=Math.round(d.battery*100)+'%';
+  if(cy.dev==='zelos')s=`배터리 ${bat} · 팟 ${Math.round(d.pod*100)}%`;
+  if(cy.dev==='nasty')s=`배터리 ${bat} · 남은 퍼프 ${Math.max(0,Math.floor(d.left)).toLocaleString('ko-KR')}`;
+  if(cy.dev==='lil')s=`배터리 ${bat} · ${d.stick==='ready'?`남은 모금 ${14-d.sp}`:d.stick==='heating'?'예열 중':'스틱 없음'}`;
+  if(cy.dev==='cig')s=d.st==='lit'?`남은 길이 ${Math.round(d.paper*100)}%`:d.st==='done'?'꽁초':d.st==='out'?'꺼짐':'불 안 붙임';
+  $('cyStatus').textContent=s;}
+function after(){cySave();renderActions();renderStatus();hint(defaultHint())}
+$('cyDev').onchange=e=>{endIn(true);cy.dev=e.target.value;firstPuff=true;charging=null;cySave();buildUI()};
+$('cyFlavor').onchange=e=>{const d=D();d.flavor=e.target.value;
+  if(cy.dev==='zelos'){d.pod=1;say(`${FL(d.flavor).n} 팟으로 갈아 끼웠어요`)}
+  else if(cy.dev==='nasty'){d.left=30000;d.battery=1;say(`${FL(d.flavor).n} 새 거 뜯었어요`);sPop()}
+  else say(`다음 스틱은 ${FL(d.flavor).n}`);firstPuff=true;after()};
+$('cyMute').onclick=()=>{cy.mute=!cy.mute;if(cy.mute)sStop();cySave();$('cyMute').textContent=cy.mute?'🔇':'🔊'};
+
+/* --- 동작 --- */
+function startCharge(){charging={t:0};say('충전기 꽂았어요');after()}
+function insertStick(){const d=D();if(d.battery<0.17){say('배터리 부족해요. 충전부터!');return}
+  d.stick='heating';d.heatT=10;d.sp=0;firstPuff=true;say('스틱 꽂았어요. 예열 10초');sClick();after()}
+function lighter(){const d=D();sClick();lighterT=0.5;
+  if(Math.random()<0.35){say(pick(['칙… 칙… 안 켜진다','라이터 가스가 없나?','바람 때문에 꺼졌다']));return}
+  setTimeout(()=>{d.st='lit';d.idle=0;firstPuff=true;say('치익—');after()},250);}
+function dropAsh(len){const tip=cigTipX();parts.push({x:tip-len/2,y:CIG_Y,vx:-8,vy:15,r:Math.max(3,len/5),g:0,a:0.8,life:0,max:1.5,ash:true});}
+
+function canInhale(){const d=D();
+  if(charging&&cy.dev!=='nasty'){say('충전 중이에요');return false}
+  if(cy.dev==='cig'){if(d.st!=='lit'){say(d.st==='done'?'꽁초밖에 안 남았어요':'불부터 붙이세요');return false}return true}
+  if(d.battery<=0.001){say(pick(['배터리 없음… 깜빡깜빡','전원이 안 켜진다']));return false}
+  if(cy.dev==='zelos'&&!d.podOk){say('팟 인식 안 됨 (깜빡깜빡)');return false}
+  if(cy.dev==='lil'){if(d.stick==='heating'){say(`예열 중… ${Math.ceil(d.heatT)}초`);return false}if(d.stick!=='ready'){say('스틱이 없어요');return false}}
+  return true;}
+function startIn(e){if(e&&e.preventDefault)e.preventDefault();if(inhaling)return;
+  if(cy.dev==='zelos'&&!D().podOk){ // 톡톡 쳐서 고치기
+    const now=performance.now();taps=taps.filter(t=>now-t<500);taps.push(now);shake=0.15;sClick();
+    if(taps.length>=2){taps=[];if(Math.random()<0.7){D().podOk=true;say('탁탁! 다시 된다');after()}else say('…아직 안 된다. 한 번 더')}return;}
+  if(!canInhale())return;
+  inhaling=true;holdStart=performance.now();hint('들이마시는 중…');sStart();}
+function endIn(silent){if(!inhaling)return;inhaling=false;sStop();
+  const held=Math.min(4,(performance.now()-holdStart)/1000);
+  if(silent===true)return;
+  if(held<0.3){hint('조금 더 길게 눌러보세요');return}
+  cy.puffs++;$('cyCount').textContent=`총 ${cy.puffs.toLocaleString('ko-KR')}모금`;
+  puffResult(held);cySave();renderStatus();renderActions();}
+
+function puffResult(held){
+  const d=D();let burnt=false,p=0.05,msg=null;
+  if(held>2.5)p+=0.15; if(firstPuff)p+=0.08; firstPuff=false;
+  if(cy.dev==='cig')p+=0.05;
+  const fk=cy.dev==='cig'?(d.capsule?'menthol':'tobacco'):d.flavor;
+  if(fk==='tobacco'||fk==='menthol')p+=0.04;
+  if(cy.dev==='zelos'){if(d.pod<=0.02){burnt=true}if(Math.random()<0.04){d.podOk=false;setTimeout(()=>{say('어? 팟 인식이 끊겼다');hint(defaultHint())},900)}
+    else if(Math.random()<0.035)msg='앗 뜨거! 액상 튀었다';}
+  if(cy.dev==='nasty'){d.left-=1;if(d.left<=0){burnt=true;d.left=0}else if(d.left<300&&Math.random()<0.4)burnt=true;
+    if(Math.random()<0.02)msg='지지직… 코일 소리가 수상하다';}
+  if(cy.dev==='lil'){d.sp++;if(d.sp===12){setTimeout(()=>{vib=0.5;sBuzz(2);say('부르르 — 2모금 남았어요')},700)}
+    if(d.sp>=14){d.stick='done';setTimeout(()=>{vib=0.6;sBuzz(3);say('부르르르 — 스틱 끝');after()},700)}}
+  if(cy.dev==='cig'){d.idle=0;if(d.paper<=0.02){burnt=true}}
+  if(burnt)p+=0.5;
+  sExhale(held);
+  if(Math.random()<Math.min(0.9,p)){ // 켁켁
+    shake=0.7;sCough();
+    say(burnt?pick(['으웩 탄맛!! 켁켁','탄맛이다… 콜록콜록']):pick(['콜록콜록!','켁… 켁켁','크헉 사레들렸다','콜록… 목 따가워','켁켁 너무 세게 빨았다']),1900);
+    coughSmoke(held);hint('…괜찮아요?');
+  }else{
+    exhale(held,1);
+    if(burnt)say(cy.dev==='cig'?'윽 필터 탄 맛':'탄맛이 난다… 갈 때가 됐다',1900);
+    else if(msg)say(msg);
+    else if(Math.random()<0.45)say(cy.dev==='cig'?(d.capsule?'화— 멘솔 연기':pick(['후—','목을 긁는 타격감','연기가 맵다'])):pick(FL(fk).line));
+    else say('후—',900);
+    setTimeout(()=>hint(defaultHint()),1500);
+  }
+}
+
+/* --- 연기 --- */
+const CIG_Y=300,CIG_H=16,PAPER_W=170,FILTER_W=56,FILTER_X=CW-40-FILTER_W;
+function cigTipX(){return FILTER_X-PAPER_W*cy.d.cig.paper}
+function mouth(){ // 내뱉는 위치/방향
+  if(cy.dev==='cig')return {x:CW-18,y:CIG_Y-40,a:-Math.PI*0.72,s:0.7};
+  return {x:CW/2,y:70,a:-Math.PI/2,s:1};}
+function smokeColor(){
+  const d=D();if(cy.dev==='cig')return [215,212,205];
+  const h=FL(d.flavor).c,r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return [Math.round(235*0.85+r*0.15),Math.round(235*0.85+g*0.15),Math.round(235*0.85+b*0.15)];}
+function exhale(held,k){
+  const m=mouth(),big=cy.dev==='nasty'?1.5:cy.dev==='zelos'?1.25:cy.dev==='lil'?1:0.8;
+  const n=Math.round((12+held*16)*big*k);const col=smokeColor();
+  for(let i=0;i<n;i++){const ang=m.a+(Math.random()-.5)*0.8,sp=(30+Math.random()*50)*(0.6+held/3)*m.s;
+    parts.push({x:m.x+(Math.random()-.5)*12,y:m.y+(Math.random()-.5)*10,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,r:7+Math.random()*10,g:(12+held*6)*big,a:0.2+held*0.05,life:0,max:2.4+Math.random()*1.8,col});}}
+function coughSmoke(held){const t=[0,280,560];t.forEach((ms,i)=>setTimeout(()=>{const m=mouth(),col=smokeColor();
+  for(let j=0;j<10+held*4;j++){const ang=Math.random()*Math.PI*2,sp=40+Math.random()*80;
+    parts.push({x:m.x,y:m.y+20,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp*0.6,r:6+Math.random()*8,g:18,a:0.22,life:0,max:1.8+Math.random(),col})}},ms));}
+
+/* --- 루프 --- */
+function step(dt){
+  const d=D();
+  heat+=((inhaling?1:0.15)-heat)*Math.min(1,dt*(inhaling?4:2));
+  shake=Math.max(0,shake-dt);vib=Math.max(0,vib-dt);lighterT=Math.max(0,lighterT-dt);
+  if(inhaling){
+    const held=(performance.now()-holdStart)/1000;
+    if(cy.dev!=='cig'&&held>6){endIn();say('6초 지나서 자동으로 멈췄어요');}
+    if(cy.dev==='zelos'){d.battery=Math.max(0,d.battery-0.006*dt);d.pod=Math.max(0,d.pod-0.012*dt)}
+    if(cy.dev==='nasty'){d.battery=Math.max(0,d.battery-0.005*dt)}
+    if(cy.dev==='cig'&&Math.random()<dt*9)sCrackle();
+    if(cy.dev!=='cig'&&cy.dev!=='lil'&&d.battery<=0){endIn();say('배터리 다 됐다… 깜빡깜빡')}
+  }
+  if(cy.dev==='lil'&&d.stick==='heating'){d.heatT-=dt;d.battery=Math.max(0,d.battery-0.17*dt/10);
+    if(d.heatT<=0){d.stick='ready';vib=0.5;sBuzz(2);say('부르르 — 예열 완료!');after()}else if(Math.random()<dt*2)renderStatus();}
+  if(charging){charging.t+=dt;d.battery=Math.min(1,d.battery+dt/4);if(Math.random()<dt*3)renderStatus();
+    if(d.battery>=1){charging=null;say('충전 완료');after()}}
+  if(cy.dev==='cig'&&d.st==='lit'){
+    const burn=(inhaling?0.06:0.003)*dt;d.paper=Math.max(0,d.paper-burn);d.ash+=burn*PAPER_W;
+    if(d.ash>30){dropAsh(d.ash);d.ash=0;if(Math.random()<0.5)say('앗 재 떨어졌다');}
+    if(!inhaling){d.idle+=dt;if(d.idle>45){d.st='out';say('담배가 꺼졌다');after()}}
+    if(d.paper<=0){d.st='done';inhaling&&endIn();say('필터까지 다 탔어요');after()}
+    if(Math.random()<dt*14){const x=cigTipX()-2;parts.push({x,y:CIG_Y-6,vx:(Math.random()-.5)*6,vy:-18-Math.random()*12,r:2.5,g:5,a:0.15,life:0,max:3.2,wisp:Math.random()*6,col:[210,207,200]})}
+  }
+  if((cy.dev==='zelos'||cy.dev==='nasty')&&inhaling&&Math.random()<dt*3){parts.push({x:CW/2+(Math.random()-.5)*10,y:78,vx:0,vy:-8,r:3,g:3,a:0.08,life:0,max:1,col:smokeColor()})}
+  for(const p of parts){p.life+=dt;
+    if(p.ash)p.vy+=220*dt;else{p.vx*=1-dt*0.9;p.vy=p.vy*(1-dt*0.9)-10*dt;if(p.wisp!=null)p.vx+=Math.sin(p.life*2+p.wisp)*10*dt;p.r+=p.g*dt}
+    p.x+=p.vx*dt;p.y+=p.vy*dt;}
+  parts=parts.filter(p=>p.life<p.max&&p.y<CH+20);
+}
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function glow(x,y,r,rgb,a){const g=cx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(1,`rgba(${rgb},0)`);cx.fillStyle=g;cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);cx.fill();}
+function screen(x,y,w,h,txt,col='#9fe3c0'){cx.fillStyle='#0d0f0e';rr(x,y,w,h,4);cx.fill();cx.fillStyle=col;cx.font='bold 11px monospace';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(txt,x+w/2,y+h/2+1);}
+function draw(){
+  cx.save();cx.clearRect(0,0,CW,CH);
+  const sh=shake*10+vib*3;if(sh>0)cx.translate((Math.random()-.5)*sh,(Math.random()-.5)*sh);
+  for(const p of parts){const k=1-p.life/p.max;
+    if(p.ash){cx.fillStyle=`rgba(150,145,135,${p.a*k})`;cx.fillRect(p.x-p.r,p.y-p.r/2,p.r*2,p.r);continue}
+    const [r,g,b]=p.col||[225,220,210];const gr=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+    gr.addColorStop(0,`rgba(${r},${g},${b},${p.a*k})`);gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
+    cx.fillStyle=gr;cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fill();}
+  ({zelos:drawZelos,nasty:drawNasty,lil:drawLil,cig:drawCig})[cy.dev]();
+  if(charging&&cy.dev!=='cig'){cx.strokeStyle='#777';cx.lineWidth=3;cx.beginPath();cx.moveTo(CW/2,CH-50);cx.bezierCurveTo(CW/2,CH-20,CW/2+60,CH-10,CW+10,CH-30);cx.stroke();}
+  cx.restore();
+}
+function drawZelos(){ // 팟 기기
+  const d=cy.d.zelos,w=84,h=200,x=CW/2-w/2,y=150;
+  cx.fillStyle='#2e2f33';rr(x+22,y-74,w-44,22,8);cx.fill();                 // 마우스피스
+  cx.fillStyle='rgba(200,210,220,.25)';rr(x+8,y-56,w-16,62,8);cx.fill();      // 팟
+  const lh=50*d.pod;cx.fillStyle=FL(d.flavor).c;cx.globalAlpha=.85;rr(x+14,y-50+(50-lh),w-28,lh,5);cx.fill();cx.globalAlpha=1;
+  const body=cx.createLinearGradient(x,0,x+w,0);body.addColorStop(0,'#55585f');body.addColorStop(.5,'#7d8189');body.addColorStop(1,'#4a4d53');
+  cx.fillStyle=body;rr(x,y,w,h,14);cx.fill();
+  screen(x+16,y+24,w-32,22,d.podOk?(charging?'⚡'+Math.round(d.battery*100)+'%':Math.round(d.battery*100)+'%'):'POD ?',d.podOk?(d.battery<0.15?'#ff8a7a':'#9fe3c0'):'#ff8a7a');
+  cx.fillStyle='#3b3d42';rr(x+w/2-14,y+70,28,10,5);cx.fill();                // 버튼
+  const lx=CW/2,ly=y+h-30;glow(lx,ly,6+heat*20,'150,220,255',0.2+heat*0.7);
+}
+function drawNasty(){ // 일회용
+  const d=cy.d.nasty,w=70,h=250,x=CW/2-w/2,y=110,c=FL(d.flavor).c;
+  cx.fillStyle='#222';rr(x+18,y-34,w-36,40,10);cx.fill();
+  const body=cx.createLinearGradient(x,0,x+w,0);body.addColorStop(0,c);body.addColorStop(.5,'#ffffff');body.addColorStop(1,c);
+  cx.globalAlpha=.9;cx.fillStyle=body;rr(x,y,w,h,16);cx.fill();cx.globalAlpha=1;
+  cx.fillStyle='rgba(0,0,0,.25)';rr(x,y,w,h,16);cx.fill();
+  screen(x+9,y+30,w-18,20,Math.max(0,Math.floor(d.left)).toString(),d.left<300?'#ff8a7a':'#9fe3c0');
+  screen(x+18,y+56,w-36,14,Math.round(d.battery*100)+'%',d.battery<0.15?'#ff8a7a':'#d9d9d9');
+  glow(CW/2,y+h-26,6+heat*22,'255,140,200',0.2+heat*0.7);
+}
+function drawLil(){ // 하이브리드: 스틱 + 카트리지
+  const d=cy.d.lil,w=86,h=200,x=CW/2-w/2,y=150;
+  if(d.stick!=='none'){const sy=y-62;cx.fillStyle=d.stick==='done'?'#cfc7b8':'#f4f1ea';rr(CW/2-9,sy,18,72,3);cx.fill();
+    cx.fillStyle='#d9c6a2';rr(CW/2-9,sy,18,20,3);cx.fill();
+    if(d.stick==='ready'||d.stick==='heating')glow(CW/2,y+4,10+heat*14,'255,170,90',(d.stick==='heating'?0.2:0.15)+heat*0.4);}
+  const body=cx.createLinearGradient(x,0,x+w,0);body.addColorStop(0,'#c9c2b4');body.addColorStop(.5,'#e8e2d6');body.addColorStop(1,'#b8b1a3');
+  cx.fillStyle=body;rr(x,y,w,h,20);cx.fill();
+  cx.fillStyle='#333';cx.beginPath();cx.ellipse(CW/2,y+8,12,5,0,0,Math.PI*2);cx.fill();
+  cx.fillStyle='rgba(90,140,200,.25)';rr(x+w-20,y+30,10,60,4);cx.fill();      // 카트리지 창
+  cx.fillStyle=FL(d.flavor).c;cx.globalAlpha=.8;rr(x+w-19,y+50,8,39,3);cx.fill();cx.globalAlpha=1;
+  const txt=d.stick==='heating'?Math.ceil(d.heatT)+'s':d.stick==='ready'?(14-d.sp)+'P':charging?'⚡'+Math.round(d.battery*100):Math.round(d.battery*100)+'%';
+  screen(x+14,y+40,w-42,24,txt,d.stick==='heating'?'#ffc27a':'#9fe3c0');
+  if(d.stick==='heating'){const pr=1-d.heatT/10;cx.fillStyle='#ffc27a';rr(x+14,y+70,(w-42)*pr,4,2);cx.fill();}
+}
+function drawCig(){
+  const d=cy.d.cig,y=CIG_Y-CIG_H/2,pw=PAPER_W*d.paper,tipX=FILTER_X-pw;
+  cx.fillStyle='#d49a55';rr(FILTER_X,y,FILTER_W,CIG_H,3);cx.fill();
+  cx.fillStyle='rgba(120,70,20,.25)';for(let i=0;i<9;i++)cx.fillRect(FILTER_X+6+i*5.5,y+3+(i%3)*3,1.5,1.5);
+  if(d.capsule){cx.fillStyle='rgba(120,200,220,.5)';cx.beginPath();cx.arc(FILTER_X+20,CIG_Y,4,0,Math.PI*2);cx.fill();}
+  if(pw>0){cx.fillStyle='#f3efe6';cx.fillRect(tipX,y,pw,CIG_H);cx.fillStyle='rgba(0,0,0,.06)';cx.fillRect(tipX,y+CIG_H-4,pw,4);}
+  if(d.st==='lit'){
+    if(d.ash>0){cx.fillStyle='#8f8a80';cx.fillRect(tipX-d.ash,y+1,d.ash,CIG_H-2);}
+    glow(tipX,CIG_Y,18+heat*26,`255,${120+heat*90|0},40`,0.35+heat*0.5);
+    cx.fillStyle=`rgb(255,${90+heat*120|0},${30+heat*40|0})`;cx.fillRect(tipX-3,y+1,4,CIG_H-2);
+  }else if(d.st==='out'&&pw>0){cx.fillStyle='#3a3530';cx.fillRect(tipX-2,y,4,CIG_H);}
+  if(lighterT>0){const lx=tipX-26,ly=CIG_Y+30;cx.fillStyle='#c04a3a';rr(lx-12,ly,24,46,5);cx.fill();
+    if(lighterT<0.42){glow(lx,ly-10,16,'255,190,80',0.8);cx.fillStyle='#ffd27a';cx.beginPath();cx.ellipse(lx,ly-10,4,10,0,0,Math.PI*2);cx.fill();}}
+}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);startIn(e)});
+cv.addEventListener('pointerup',()=>endIn());cv.addEventListener('pointercancel',()=>endIn());cv.addEventListener('lostpointercapture',()=>endIn());
+cv.addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat){e.preventDefault();startIn()}else if(e.code==='Space')e.preventDefault()});
+cv.addEventListener('keyup',e=>{if(e.code==='Space')endIn()});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+function loop(now){const dt=Math.min(0.05,(now-lastT)/1000);lastT=now;
+  if(!$('cyber').classList.contains('hidden')){step(dt);draw();}
+  requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+setInterval(cySave,5000);
+
+
+state=load();
+if(state&&state.start)showMain();else showSetup(false);
+</script>
+</body>
+</html>
